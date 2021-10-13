@@ -1,53 +1,68 @@
-"""
-Tests for plugin.py.
-
-Tests are written using the pytest library (https://docs.pytest.org), and you
-should read the testing guidelines in the CKAN docs:
-https://docs.ckan.org/en/2.9/contributing/testing.html
-
-To write tests for your extension you should install the pytest-ckan package:
-
-    pip install pytest-ckan
-
-This will allow you to use CKAN specific fixtures on your tests.
-
-For instance, if your test involves database access you can use `clean_db` to
-reset the database:
-
-    import pytest
-
-    from ckan.tests import factories
-
-    @pytest.mark.usefixtures("clean_db")
-    def test_some_action():
-
-        dataset = factories.Dataset()
-
-        # ...
-
-For functional tests that involve requests to the application, you can use the
-`app` fixture:
-
-    from ckan.plugins import toolkit
-
-    def test_some_endpoint(app):
-
-        url = toolkit.url_for('myblueprint.some_endpoint')
-
-        response = app.get(url)
-
-        assert response.status_code == 200
-
-
-To temporary patch the CKAN configuration for the duration of a test you can use:
-
-    import pytest
-
-    @pytest.mark.ckan_config("ckanext.myext.some_key", "some_value")
-    def test_some_action():
-        pass
-"""
 import ckanext.short_urls.plugin as plugin
+from ckanext.short_urls.logic import (
+    short_url_create,
+    short_url_get
+)
+from ckanext.short_urls.model import (
+    OBJECT_TYPE_DATASET,
+    OBJECT_TYPE_RESOURCE,
+)
 
-def test_plugin():
-    pass
+
+def _set_object_to_deleted(object_type, object_id):
+    if object_type == OBJECT_TYPE_DATASET:
+        # TODO: set dataset to deleted
+        pass
+    elif object_type == OBJECT_TYPE_RESOURCE:
+        # TODO: set resource to deleted
+        pass
+    else:
+        raise BaseException(
+            f'Unhandled object_type: {object_type}'
+        )
+
+
+def test_creating_multiple_short_urls_for_the_same_dataset():
+    short_url_create(OBJECT_TYPE_DATASET, 1)
+    # TODO: this should fail
+    short_url_create(OBJECT_TYPE_DATASET, 1)
+
+
+def test_creating_multiple_short_urls_for_the_same_resource():
+    short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    # TODO: this should fail
+    short_url_create(OBJECT_TYPE_RESOURCE, 1)
+
+
+def test_short_url_for_active_dataset():
+    short_url = short_url_create(OBJECT_TYPE_DATASET, 1)
+    fetched_short_url = short_url_get(short_url['hash'])
+    assert short_url['id'] == fetched_short_url['id']
+    assert short_url['hash'] == fetched_short_url['hash']
+    assert short_url['object_type'] == fetched_short_url['object_type']
+    assert short_url['object_id'] == fetched_short_url['object_id']
+
+
+def test_short_url_for_active_resource():
+    short_url = short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    fetched_short_url = short_url_get(short_url['hash'])
+    assert short_url['id'] == fetched_short_url['id']
+    assert short_url['hash'] == fetched_short_url['hash']
+    assert short_url['object_type'] == fetched_short_url['object_type']
+    assert short_url['object_id'] == fetched_short_url['object_id']
+
+
+def test_short_url_for_deleted_dataset():
+    short_url = short_url_create(OBJECT_TYPE_DATASET, 1)
+    _set_object_to_deleted(OBJECT_TYPE_DATASET, 1)
+    fetched_short_url = short_url_get(short_url['hash'])
+    assert short_url['object_state'] == 'active'
+    assert fetched_short_url['object_state'] == 'deleted'
+
+
+def test_short_url_for_deleted_resource():
+    short_url = short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    _set_object_to_deleted(OBJECT_TYPE_RESOURCE, 1)
+    fetched_short_url = short_url_get(short_url['hash'])
+    assert short_url['object_state'] == 'active'
+    assert fetched_short_url['object_state'] == 'deleted'
