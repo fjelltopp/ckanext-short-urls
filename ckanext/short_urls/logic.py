@@ -18,9 +18,9 @@ def _get_short_url_object_state(object_type, object_id):
         )
 
 
-def _get_short_url_from_short_code(short_code):
+def _get_short_url_from_code(code):
     short_url = model.Session.query(ShortUrls)\
-        .filter(ShortUrls.short_code == short_code)\
+        .filter(ShortUrls.code == code)\
         .one()
     return_dict = short_url.to_dict()
     return_dict.update({
@@ -34,12 +34,12 @@ def _get_short_url_from_short_code(short_code):
 
 def short_url_create(object_type, object_id):
     new_short_url = ShortUrls(object_type, object_id)
-    # TODO: retry on short_code unique error
+    # TODO: retry on code unique error
     # TODO: raise error on object_type/object_id unique error
     model.Session.add(new_short_url)
     model.repo.commit()
-    return _get_short_url_from_short_code(new_short_url['short_code'])
+    return _get_short_url_from_code(new_short_url['code'])
 
 
-def short_url_get(short_code):
-    return _get_short_url_from_short_code(short_code)
+def short_url_get(code):
+    return _get_short_url_from_code(code)
