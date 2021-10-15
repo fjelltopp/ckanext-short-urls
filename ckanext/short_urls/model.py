@@ -1,6 +1,4 @@
-import string
 import enum
-import random
 from enum import auto
 from sqlalchemy import Column, types, UniqueConstraint, Enum
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,26 +12,14 @@ class ObjectType(enum.Enum):
     RESOURCE = auto()
 
 
-def _generate_random_string(length=8):
-    # taken from https://bit.ly/3nxGSMo
-    alphanumeric_chars = string.ascii_lowercase + string.digits
-    return ''.join(
-        random.SystemRandom().choice(alphanumeric_chars)
-        for _ in range(length)
-    )
-
-
-class ShortUrls(Base):
+class ShortUrl(Base):
     """
     Stores a short_url pointing to a specific dataset or resource
     """
     __tablename__ = 'short_url'
 
     id = Column(types.Integer, primary_key=True, nullable=False)
-    code = Column(
-        types.UnicodeText, nullable=False,
-        default=_generate_random_string()
-    )
+    code = Column(types.UnicodeText, nullable=False)
     object_type = Column(ObjectType, nullable=False)
     object_id = Column(types.Integer, nullable=False)
 
@@ -47,8 +33,8 @@ class ShortUrls(Base):
 
 
 def init_tables():
-    ShortUrls.__table__.create()
+    ShortUrl.__table__.create()
 
 
 def tables_exists():
-    return ShortUrls.__table__.exists()
+    return ShortUrl.__table__.exists()

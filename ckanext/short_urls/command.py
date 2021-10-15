@@ -15,11 +15,11 @@ def initdb(ctx):
     """Creates the necessary tables for short_urls in the database.
     """
     if tables_exists():
-        click.secho('ShortUrls tables already exist', fg="green")
+        click.secho('ShortUrl tables already exist', fg="green")
         ctx.exit(0)
 
     init_tables()
-    click.secho('ShortUrls tables created', fg="green")
+    click.secho('ShortUrl tables created', fg="green")
 
 
 def get_commands():
