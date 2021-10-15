@@ -3,17 +3,14 @@ from ckanext.short_urls.logic import (
     short_url_create,
     short_url_get
 )
-from ckanext.short_urls.model import (
-    OBJECT_TYPE_DATASET,
-    OBJECT_TYPE_RESOURCE,
-)
+from ckanext.short_urls.model import ObjectType
 
 
 def _set_object_to_deleted(object_type, object_id):
-    if object_type == OBJECT_TYPE_DATASET:
+    if object_type == ObjectType.DATASET:
         # TODO: set dataset to deleted
         pass
-    elif object_type == OBJECT_TYPE_RESOURCE:
+    elif object_type == ObjectType.RESOURCE:
         # TODO: set resource to deleted
         pass
     else:
@@ -23,19 +20,19 @@ def _set_object_to_deleted(object_type, object_id):
 
 
 def test_creating_multiple_short_urls_for_the_same_dataset():
-    short_url_create(OBJECT_TYPE_DATASET, 1)
+    short_url_create(ObjectType.DATASET, 1)
     # TODO: this should fail
-    short_url_create(OBJECT_TYPE_DATASET, 1)
+    short_url_create(ObjectType.DATASET, 1)
 
 
 def test_creating_multiple_short_urls_for_the_same_resource():
-    short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    short_url_create(ObjectType.RESOURCE, 1)
     # TODO: this should fail
-    short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    short_url_create(ObjectType.RESOURCE, 1)
 
 
 def test_short_url_for_active_dataset():
-    short_url = short_url_create(OBJECT_TYPE_DATASET, 1)
+    short_url = short_url_create(ObjectType.DATASET, 1)
     fetched_short_url = short_url_get(short_url['hash'])
     assert short_url['id'] == fetched_short_url['id']
     assert short_url['hash'] == fetched_short_url['hash']
@@ -44,7 +41,7 @@ def test_short_url_for_active_dataset():
 
 
 def test_short_url_for_active_resource():
-    short_url = short_url_create(OBJECT_TYPE_RESOURCE, 1)
+    short_url = short_url_create(ObjectType.RESOURCE, 1)
     fetched_short_url = short_url_get(short_url['hash'])
     assert short_url['id'] == fetched_short_url['id']
     assert short_url['hash'] == fetched_short_url['hash']
@@ -53,16 +50,16 @@ def test_short_url_for_active_resource():
 
 
 def test_short_url_for_deleted_dataset():
-    short_url = short_url_create(OBJECT_TYPE_DATASET, 1)
-    _set_object_to_deleted(OBJECT_TYPE_DATASET, 1)
+    short_url = short_url_create(ObjectType.DATASET, 1)
+    _set_object_to_deleted(ObjectType.DATASET, 1)
     fetched_short_url = short_url_get(short_url['hash'])
     assert short_url['object_state'] == 'active'
     assert fetched_short_url['object_state'] == 'deleted'
 
 
 def test_short_url_for_deleted_resource():
-    short_url = short_url_create(OBJECT_TYPE_RESOURCE, 1)
-    _set_object_to_deleted(OBJECT_TYPE_RESOURCE, 1)
+    short_url = short_url_create(ObjectType.RESOURCE, 1)
+    _set_object_to_deleted(ObjectType.RESOURCE, 1)
     fetched_short_url = short_url_get(short_url['hash'])
     assert short_url['object_state'] == 'active'
     assert fetched_short_url['object_state'] == 'deleted'

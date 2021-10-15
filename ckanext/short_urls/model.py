@@ -1,21 +1,24 @@
 import string
+import enum
 import random
-from sqlalchemy import Column, types, UniqueConstraint
+from sqlalchemy import Column, types, UniqueConstraint, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from ckan.model.meta import metadata
 
 Base = declarative_base(metadata=metadata)
 
-OBJECT_TYPE_DATASET = 'dataset'
-OBJECT_TYPE_RESOURCE = 'resource'
+
+class ObjectType(enum.Enum):
+    DATASET = 'dataset'
+    RESOURCE = 'resource'
 
 
-def _generate_random_string(string_length=6):
+def _generate_random_string(length=8):
     # taken from https://bit.ly/3nxGSMo
     alphanumeric_chars = string.ascii_lowercase + string.digits
     return ''.join(
         random.SystemRandom().choice(alphanumeric_chars)
-        for _ in range(string_length)
+        for _ in range(length)
     )
 
 
@@ -26,14 +29,14 @@ class ShortUrls(Base):
     __tablename__ = 'short_url'
 
     id = Column(types.Integer, primary_key=True, nullable=False)
-    hash = Column(
+    short_code = Column(
         types.UnicodeText, nullable=False,
         default=_generate_random_string()
     )
-    object_type = Column(types.UnicodeText, nullable=False)
+    object_type = Column(ObjectType, nullable=False)
     object_id = Column(types.Integer, nullable=False)
 
-    UniqueConstraint('hash')
+    UniqueConstraint('short_code')
     UniqueConstraint('object_type', 'object_id')
 
     def to_dict(self):

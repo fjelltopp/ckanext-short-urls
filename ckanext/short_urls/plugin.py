@@ -2,8 +2,7 @@ import logging
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckanext.short_urls.model import (
-    OBJECT_TYPE_DATASET,
-    OBJECT_TYPE_RESOURCE,
+    ObjectType,
     tables_exists
 )
 from ckanext.short_urls.logic import (
@@ -25,9 +24,9 @@ def _data_dict_is_resource(data_dict):
 
 def _get_object_type(data_dict):
     if _data_dict_is_resource(data_dict):
-        return OBJECT_TYPE_RESOURCE
+        return ObjectType.RESOURCE
     else:
-        return OBJECT_TYPE_DATASET
+        return ObjectType.DATASET
 
 
 class ShortUrlsPlugin(plugins.SingletonPlugin):
