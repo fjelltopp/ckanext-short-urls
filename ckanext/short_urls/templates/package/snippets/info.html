@@ -1,0 +1,15 @@
+{% ckan_extends %}
+
+{% block heading %}
+
+    {{ super() }}
+
+    {% set short_url = h.get_short_url_from_object_id(pkg.id) %}
+        
+    <!-- TODO: this div is just a placeholder and needs testing -->
+    <div id="ShortUrl">
+        <span>Short URL: </span>
+        <a href="link/{{ short_url.code }}">{{ short_url }}</a>
+    </div>
+
+{% endblock %}

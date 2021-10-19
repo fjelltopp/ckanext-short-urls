@@ -7,7 +7,7 @@ from ckanext.short_urls.model import (
 )
 from ckanext.short_urls.logic import (
     short_url_create,
-    short_url_get
+    get_short_url_from_object_id
 )
 from ckanext.short_urls import command
 
@@ -64,5 +64,5 @@ class ShortUrlsPlugin(plugins.SingletonPlugin):
     # ITemplateHelpers
     def get_helpers(self):
         return {
-            u'short_url_get': short_url_get,
+            u'get_short_url_from_object_id': get_short_url_from_object_id,
         }

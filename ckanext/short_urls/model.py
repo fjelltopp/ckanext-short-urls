@@ -20,8 +20,8 @@ class ShortUrl(Base):
 
     id = Column(types.Integer, primary_key=True, nullable=False)
     code = Column(types.UnicodeText, nullable=False)
-    object_type = Column(ObjectType, nullable=False)
-    object_id = Column(types.Integer, nullable=False)
+    object_type = Column(Enum(ObjectType), nullable=False)
+    object_id = Column(types.UnicodeText, nullable=False)
 
     UniqueConstraint('code')
     UniqueConstraint('object_type', 'object_id')
