@@ -1,41 +1,43 @@
 from flask import Blueprint
+from flask.views import MethodView
 import ckan.plugins.toolkit as toolkit
 from ckan.lib import helpers as h
 from ckanext.short_urls.model import ObjectType
-from ckanext.short_urls.logic import short_url_get
+from ckanext.short_urls.logic import get_short_url_from_code
 
 
 short_urls_blueprint = Blueprint(
-    u'short_urls_blueprint',
+    u'short_urls',
     __name__
 )
 
 
-def short_url_redirect(short_url_code):
-    short_url = short_url_get(short_url_code)
-    object_type = short_url['object_type']
-    if short_url['object_state'] == 'active':
+class ShortUrlRedirect(MethodView):
+    def get(self, code):
+        short_url = get_short_url_from_code(code)
+        object_type = short_url['object_type']
         if object_type == ObjectType.DATASET:
             url = toolkit.url_for(
                 'dataset.read',
                 id=short_url['object_id']
             )
         elif object_type == ObjectType.RESOURCE:
+            resource = toolkit.get_action('resource_show')(
+                {'ignore_auth': True}, {'id': short_url['object_id']}
+            )
             url = toolkit.url_for(
                 'resource.read',
-                id=short_url['object_id']
+                id=resource['package_id'],
+                resource_id=resource['id']
             )
         else:
-            raise BaseException(
+            raise TypeError(
                 f'object_type {object_type} unrecognized'
             )
-    else:
-        # TODO: what do we do if the object.state != active??
-        url = '#'
-    return h.redirect_to(url)
+        return h.redirect_to(url)
 
 
 short_urls_blueprint.add_url_rule(
-    u'/link/<short_url_code>',
-    view_func=short_url_redirect
+    u'/link/<code>',
+    view_func=ShortUrlRedirect.as_view('redirect')
 )
