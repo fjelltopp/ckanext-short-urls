@@ -1,13 +1,9 @@
 import logging
 import string
 import random
-from ckan.model import core
 from ckan import model
-import ckan.plugins.toolkit as t
-from ckanext.short_urls.model import (
-    ShortUrl,
-    ObjectType
-)
+from ckanext.short_urls.model import ShortUrl
+
 log = logging.getLogger(__name__)
 
 
@@ -34,12 +30,14 @@ def _generate_random_string(length=8):
     )
 
 
+def _short_url_code_exists(code):
+    short_urls_using_code = model.Session.query(ShortUrl)\
+        .filter(ShortUrl.code == code)\
+        .count()
+    return short_urls_using_code > 0
+
+
 def _generate_unique_short_url_code():
-    def _short_url_code_exists(code):
-        short_urls_using_code = model.Session.query(ShortUrl)\
-            .filter(ShortUrl.code == code)\
-            .count()
-        return short_urls_using_code > 0
     code = _generate_random_string()
     while _short_url_code_exists(code):
         log.info(f'ShortUrl Code {code} already taken. Retrying...')

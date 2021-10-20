@@ -2,12 +2,10 @@ import logging
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
 from ckanext.short_urls.model import (
-    ObjectType,
-    tables_exists
+    ObjectType, tables_exists
 )
 from ckanext.short_urls.logic import (
-    short_url_create,
-    get_short_url_from_object_id
+    short_url_create, get_short_url_from_object_id
 )
 from ckanext.short_urls import command
 from ckanext.short_urls.blueprints import blueprints
