@@ -24,7 +24,7 @@ class ShortUrl(Base):
     object_id = Column(types.UnicodeText, nullable=False)
 
     UniqueConstraint('code')
-    UniqueConstraint('object_type', 'object_id')
+    UniqueConstraint('object_id')
 
     def to_dict(self):
         output = self.__dict__.copy()

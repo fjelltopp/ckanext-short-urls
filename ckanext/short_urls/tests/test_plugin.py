@@ -1,3 +1,6 @@
+from ckanext.short_urls.logic import (
+    short_url_create
+)
 import pytest
 from unittest import mock
 from ckan.model import core
@@ -45,6 +48,19 @@ class TestPlugin(object):
             with pytest.raises(MultipleResultsFound):
                 factories.Resource(package_id=dataset['id'])
 
+    def test_creating_multiple_short_urls_for_the_same_dataset_gives_an_error(self):
+        dataset = factories.Dataset()
+        short_url_create(ObjectType.DATASET, dataset['id'])
+        with pytest.raises(MultipleResultsFound):
+            short_url_create(ObjectType.DATASET, dataset['id'])
+
+    def test_creating_multiple_short_urls_for_the_same_resource_gives_an_error(self):
+        dataset = factories.Dataset()
+        resource = factories.Resource(package_id=dataset['id'])
+        short_url_create(ObjectType.RESOURCE, resource['id'])
+        with pytest.raises(MultipleResultsFound):
+            short_url_create(ObjectType.RESOURCE, resource['id'])
+
     def test_short_url_on_dataset_page_is_correct(self, app):
         user = factories.User()
         dataset = dataset = factories.Dataset(user=user)
@@ -90,3 +106,45 @@ class TestPlugin(object):
         )[0]
         short_url_href = short_url_div.find('a')['href']
         assert short_url_href == expected_short_url_href
+
+    def test_short_url_for_dataset_redirects_to_dataset_page(self, app):
+        user = factories.User()
+        dataset = factories.Dataset(user=user)
+        short_url = get_short_url_from_object_id(dataset['id'])
+        response = app.get(
+            url=url_for(
+                'short_urls.redirect',
+                code=short_url['code']
+            ),
+            extra_environ={'REMOTE_USER': user['name']},
+            status=302,
+            follow_redirects=False
+        )
+        dataset_read_url = url_for(
+            'dataset.read',
+            id=dataset['id'],
+            _external=True
+        )
+        assert response.headers['location'] == dataset_read_url
+
+    def test_short_url_for_resource_redirects_to_resource_page(self, app):
+        user = factories.User()
+        dataset = factories.Dataset(user=user)
+        resource = factories.Resource(package_id=dataset['id'])
+        short_url = get_short_url_from_object_id(resource['id'])
+        response = app.get(
+            url=url_for(
+                'short_urls.redirect',
+                code=short_url['code']
+            ),
+            extra_environ={'REMOTE_USER': user['name']},
+            status=302,
+            follow_redirects=False
+        )
+        resource_read_url = url_for(
+            'resource.read',
+            id=dataset['id'],
+            resource_id=resource['id'],
+            _external=True
+        )
+        assert response.headers['location'] == resource_read_url

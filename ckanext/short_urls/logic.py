@@ -10,14 +10,14 @@ log = logging.getLogger(__name__)
 def get_short_url_from_code(code):
     short_url = model.Session.query(ShortUrl)\
         .filter(ShortUrl.code == code)\
-        .one_or_none()
+        .one()
     return short_url.to_dict()
 
 
 def get_short_url_from_object_id(object_id):
     short_url = model.Session.query(ShortUrl)\
         .filter(ShortUrl.object_id == object_id)\
-        .one_or_none()
+        .one()
     return short_url.to_dict()
 
 
@@ -52,5 +52,9 @@ def short_url_create(object_type, object_id):
         object_id=object_id,
     )
     model.Session.add(new_short_url)
-    model.repo.commit()
+    model.Session.commit()
     return get_short_url_from_code(new_short_url.code)
+    # TODO: figure out why the model's UniqueConstraint only applies when
+    # using a new session. Ideally we want to return new_short_url.to_dict()
+    # here however cannot as UniqueConstraint isn't respected which causes
+    # our tests to fail as multiple invalid rows can be inserted
