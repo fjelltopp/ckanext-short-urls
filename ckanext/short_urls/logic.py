@@ -53,8 +53,4 @@ def short_url_create(object_type, object_id):
     )
     model.Session.add(new_short_url)
     model.Session.commit()
-    return get_short_url_from_code(new_short_url.code)
-    # TODO: figure out why the model's UniqueConstraint only applies when
-    # using a new session. Ideally we want to return new_short_url.to_dict()
-    # here however cannot as UniqueConstraint isn't respected which causes
-    # our tests to fail as multiple invalid rows can be inserted
+    return new_short_url.to_dict()
