@@ -17,8 +17,8 @@ def get_short_url_from_code(code):
 def get_short_url_from_object_id(object_id):
     short_url = model.Session.query(ShortUrl)\
         .filter(ShortUrl.object_id == object_id)\
-        .one()
-    return short_url.to_dict()
+        .one_or_none()
+    return short_url.to_dict() if short_url else None
 
 
 def _generate_random_string(length=8):

@@ -2,17 +2,19 @@
 
 {% block nums %}
 
-    {% set short_url = h.get_short_url_from_object_id(pkg.id) %}
-    {% set short_url_link = h.url_for('short_urls.redirect', code=short_url.code, _external=True) %}
+    {% set short_url = h.get_short_url_from_object_id(pkg.id) %}    
     {% set num_followers = h.follow_count('dataset', pkg.id) %}
 
     <div class="nums">
-        <div id="DatasetPageShortUrlContainer">
-            <dl>
-                <dt>{{ _('Short URL') }}</dt>
-                <div><a href="{{ short_url_link }}">{{ short_url_link }}</a></div>
-            </dl>
-        </div>
+        {% if short_url %}
+            {% set short_url_link = h.url_for('short_urls.redirect', code=short_url.code, _external=True) %}
+            <div id="DatasetPageShortUrlContainer">
+                <dl>
+                    <dt>{{ _('Short URL') }}</dt>
+                    <div><a href="{{ short_url_link }}">{{ short_url_link }}</a></div>
+                </dl>
+            </div>
+        {% endif %}        
         <div>
             <dl>
                 <dt>{{ _('Followers') }}</dt>

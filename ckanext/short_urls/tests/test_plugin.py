@@ -14,6 +14,8 @@ from bs4 import BeautifulSoup
 
 generate_unique_short_url_code_function = \
     'ckanext.short_urls.logic._generate_unique_short_url_code'
+dataset_or_resource_after_create_action = \
+    'ckanext.short_urls.plugin.ShortUrlsPlugin.after_create'
 
 
 @pytest.mark.usefixtures('with_plugins')
@@ -103,9 +105,7 @@ class TestPlugin(object):
             extra_environ={'REMOTE_USER': user['name']}
         )
         soup = BeautifulSoup(response.body)
-        short_url_div = soup.find_all(
-            'div', {'class': 'text-muted ellipsis'}
-        )[0]
+        short_url_div = soup.find(id='ResourcePageShortUrlContainer')
         short_url_href = short_url_div.find('a')['href']
         assert short_url_href == expected_short_url_href
 
@@ -150,3 +150,35 @@ class TestPlugin(object):
             _external=True
         )
         assert response.headers['location'] == resource_read_url
+
+    def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
+        user = factories.User()
+        with mock.patch(dataset_or_resource_after_create_action):
+            dataset = dataset = factories.Dataset(user=user)
+        response = app.get(
+            url=url_for(
+                'dataset.read',
+                id=dataset['name'],
+            ),
+            extra_environ={'REMOTE_USER': user['name']}
+        )
+        soup = BeautifulSoup(response.body)
+        short_url_div = soup.find(id='DatasetPageShortUrlContainer')
+        assert not short_url_div
+
+    def test_short_url_on_resource_page_is_hidden_if_missing(self, app):
+        user = factories.User()
+        dataset = dataset = factories.Dataset(user=user)
+        with mock.patch(dataset_or_resource_after_create_action):
+            resource = factories.Resource(package_id=dataset['id'])
+        response = app.get(
+            url=url_for(
+                'resource.read',
+                id=dataset['id'],
+                resource_id=resource['id']
+            ),
+            extra_environ={'REMOTE_USER': user['name']}
+        )
+        soup = BeautifulSoup(response.body)
+        short_url_div = soup.find(id='ResourcePageShortUrlContainer')
+        assert not short_url_div
