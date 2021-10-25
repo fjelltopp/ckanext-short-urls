@@ -67,7 +67,7 @@ class TestPlugin(object):
 
     def test_short_url_on_dataset_page_is_correct(self, app):
         user = factories.User()
-        dataset = dataset = factories.Dataset(user=user)
+        dataset = factories.Dataset(user=user)
         short_url = get_short_url_from_object_id(dataset['id'])
         expected_short_url_href = url_for(
             'short_urls.redirect',
@@ -88,7 +88,7 @@ class TestPlugin(object):
 
     def test_short_url_on_resource_page_is_correct(self, app):
         user = factories.User()
-        dataset = dataset = factories.Dataset(user=user)
+        dataset = factories.Dataset(user=user)
         resource = factories.Resource(package_id=dataset['id'])
         short_url = get_short_url_from_object_id(resource['id'])
         expected_short_url_href = url_for(
@@ -154,7 +154,7 @@ class TestPlugin(object):
     def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
         user = factories.User()
         with mock.patch(dataset_or_resource_after_create_action):
-            dataset = dataset = factories.Dataset(user=user)
+            dataset = factories.Dataset(user=user)
         response = app.get(
             url=url_for(
                 'dataset.read',
@@ -168,7 +168,7 @@ class TestPlugin(object):
 
     def test_short_url_on_resource_page_is_hidden_if_missing(self, app):
         user = factories.User()
-        dataset = dataset = factories.Dataset(user=user)
+        dataset = factories.Dataset(user=user)
         with mock.patch(dataset_or_resource_after_create_action):
             resource = factories.Resource(package_id=dataset['id'])
         response = app.get(
