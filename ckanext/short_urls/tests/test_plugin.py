@@ -9,7 +9,7 @@ from ckan.tests import factories
 import ckan.plugins.toolkit as t
 from ckanext.short_urls.logic import get_short_url_from_object_id
 from ckanext.short_urls.model import ObjectType
-from sqlalchemy.orm.exc import MultipleResultsFound
+from sqlalchemy.exc import IntegrityError
 from bs4 import BeautifulSoup
 
 generate_unique_short_url_code_function = \
@@ -34,31 +34,33 @@ class TestPlugin(object):
         assert short_url['object_id'] == resource['id']
 
     def test_creating_multiple_dataset_short_urls_with_the_same_code(self):
-        with mock.patch(generate_unique_short_url_code_function) as mocked_function:
-            mocked_function.return_value = 'mocked_code'
+        with mock.patch(
+            generate_unique_short_url_code_function,
+            return_value='duplicate_short_code'
+        ):
             factories.Dataset()
-            with pytest.raises(MultipleResultsFound):
+            with pytest.raises(IntegrityError):
                 factories.Dataset()
 
     def test_creating_multiple_resource_short_urls_with_the_same_code(self):
         dataset = factories.Dataset()
-        with mock.patch(generate_unique_short_url_code_function) as mocked_function:
-            mocked_function.return_value = 'mocked_code'
+        with mock.patch(
+            generate_unique_short_url_code_function,
+            return_value='duplicate_short_code'
+        ):
             factories.Resource(package_id=dataset['id'])
-            with pytest.raises(MultipleResultsFound):
+            with pytest.raises(IntegrityError):
                 factories.Resource(package_id=dataset['id'])
 
     def test_creating_multiple_short_urls_for_the_same_dataset_gives_an_error(self):
         dataset = factories.Dataset()
-        short_url_create(ObjectType.DATASET, dataset['id'])
-        with pytest.raises(MultipleResultsFound):
+        with pytest.raises(IntegrityError):
             short_url_create(ObjectType.DATASET, dataset['id'])
 
     def test_creating_multiple_short_urls_for_the_same_resource_gives_an_error(self):
         dataset = factories.Dataset()
         resource = factories.Resource(package_id=dataset['id'])
-        short_url_create(ObjectType.RESOURCE, resource['id'])
-        with pytest.raises(MultipleResultsFound):
+        with pytest.raises(IntegrityError):
             short_url_create(ObjectType.RESOURCE, resource['id'])
 
     def test_short_url_on_dataset_page_is_correct(self, app):

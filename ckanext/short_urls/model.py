@@ -19,12 +19,9 @@ class ShortUrl(Base):
     __tablename__ = 'short_url'
 
     id = Column(types.Integer, primary_key=True, nullable=False)
-    code = Column(types.UnicodeText, nullable=False)
+    code = Column(types.UnicodeText, nullable=False, unique=True)
     object_type = Column(Enum(ObjectType), nullable=False)
-    object_id = Column(types.UnicodeText, nullable=False)
-
-    UniqueConstraint('code')
-    UniqueConstraint('object_id')
+    object_id = Column(types.UnicodeText, nullable=False, unique=True)
 
     def to_dict(self):
         output = self.__dict__.copy()
