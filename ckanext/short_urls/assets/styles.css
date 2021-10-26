@@ -1,0 +1,12 @@
+#DatasetPageShortUrlContainer {
+    display: inline-block;
+}
+
+#DatasetPageShortUrlContainer dl{
+    width: 100%;
+}
+
+#DatasetPageShortUrlContainer a{
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}

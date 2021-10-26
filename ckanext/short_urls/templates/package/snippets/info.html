@@ -1,0 +1,26 @@
+{% ckan_extends %}
+
+{% block nums %}
+
+    {% set short_url = h.get_short_url_from_object_id(pkg.id) %}    
+    {% set num_followers = h.follow_count('dataset', pkg.id) %}
+
+    <div class="nums">
+        {% if short_url %}
+            {% set short_url_link = h.url_for('short_urls.redirect', code=short_url.code, _external=True) %}
+            <div id="DatasetPageShortUrlContainer">
+                <dl>
+                    <dt>{{ _('Short URL') }}</dt>
+                    <div><a href="{{ short_url_link }}">{{ short_url_link }}</a></div>
+                </dl>
+            </div>
+        {% endif %}        
+        <div>
+            <dl>
+                <dt>{{ _('Followers') }}</dt>
+                <dd data-module="followers-counter" data-module-id="{{ pkg.id }}" data-module-num_followers="{{ num_followers }}">{{ h.SI_number_span(num_followers) }}</dd>
+            </dl>
+        </div>
+    </div>
+
+{% endblock %}

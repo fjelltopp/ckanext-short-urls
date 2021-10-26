@@ -1,14 +1,4 @@
-# short_urls-js:
-#   filter: rjsmin
-#   output: ckanext-short_urls/%(version)s-short_urls.js
-#   contents:
-#     - js/short_urls.js
-#   extra:
-#     preload:
-#       - base/main
-
-# short_urls-css:
-#   filter: cssrewrite
-#   output: ckanext-short_urls/%(version)s-short_urls.css
-#   contents:
-#     - css/short_urls.css
+Styles:
+    contents:
+        - styles.css
+    output: short_urls/%(version)s_styles.css

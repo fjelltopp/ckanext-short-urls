@@ -1,0 +1,18 @@
+{% ckan_extends %}
+
+{% block resource_read_url %}    
+
+    {% set short_url = h.get_short_url_from_object_id(res.id) %}
+    {% if short_url %}
+        {% set short_url_link = h.url_for('short_urls.redirect', code=short_url.code, _external=True) %}
+        <div id="ResourcePageShortUrlContainer" class="text-muted ellipsis">{{ _('Short URL:') }} <a class="resource-url-analytics" href="{{ short_url_link }}" title="{{ short_url_link }}">{{ short_url_link }}</a></div>
+    {% endif %}
+
+    {% if res.url and h.is_url(res.url) %}
+        <div class="text-muted ellipsis">{{ _('Download URL:') }} <a class="resource-url-analytics" href="{{ res.url }}" title="{{ res.url }}">{{ res.url }}</a></div>
+    {% elif res.url %}
+        <div class="text-muted break-word">{{ _('Download URL:') }} {{ res.url }}</div>
+    {% endif %}
+    <br />
+
+{% endblock %}
