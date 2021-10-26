@@ -1,4 +1,5 @@
 import click
+import ckan.model
 from ckan.plugins import toolkit
 from ckanext.short_urls.model import (
     init_tables, tables_exists, ObjectType
@@ -27,15 +28,18 @@ def initdb(ctx):
 
 
 @short_urls.command()
-#@click.pass_context
-def assign_short_urls_to_existing_dataset():
-    pass
-    # datasets = toolkit.get_action('package_list')(
-    #     {'ignore_auth': True}, {}
-    # )
-    # assert datasets
-    # for dataset in datasets:
-    #     short_url_create(ObjectType.DATASET, dataset['id'])
+def migrate_data():
+    datasets = toolkit.get_action('current_package_list_with_resources')(
+        {
+            'model': ckan.model,
+            'session': ckan.model.Session,
+            'ignore_auth': True,
+        }, {}
+    )
+    for dataset in datasets:
+        short_url_create(ObjectType.DATASET, dataset['id'])
+        for resource in dataset['resources']:
+            short_url_create(ObjectType.RESOURCE, resource['id'])
 
 
 def get_commands():
