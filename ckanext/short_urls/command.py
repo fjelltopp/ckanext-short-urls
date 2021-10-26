@@ -1,4 +1,6 @@
 import click
+from sqlalchemy.exc import IntegrityError
+
 import ckan.model
 from ckan.plugins import toolkit
 from ckanext.short_urls.model import (
@@ -28,18 +30,27 @@ def initdb(ctx):
 
 
 @short_urls.command()
-def migrate_data():
+def migrate():
     datasets = toolkit.get_action('current_package_list_with_resources')(
         {
             'model': ckan.model,
             'session': ckan.model.Session,
-            'ignore_auth': True,
+            'user': None, # will exclude private datasets
+            'ignore_auth': True
         }, {}
     )
     for dataset in datasets:
-        short_url_create(ObjectType.DATASET, dataset['id'])
+        try:
+            short_url_create(ObjectType.DATASET, dataset['id'])
+        except IntegrityError:
+            # short url exists
+            pass
         for resource in dataset['resources']:
-            short_url_create(ObjectType.RESOURCE, resource['id'])
+            try:
+                short_url_create(ObjectType.RESOURCE, resource['id'])
+            except IntegrityError:
+                # short url exists
+                pass
 
 
 def get_commands():
