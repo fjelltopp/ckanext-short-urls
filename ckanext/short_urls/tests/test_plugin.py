@@ -14,8 +14,10 @@ from bs4 import BeautifulSoup
 
 generate_unique_short_url_code_function = \
     'ckanext.short_urls.logic._generate_unique_short_url_code'
-dataset_or_resource_after_create_action = \
-    'ckanext.short_urls.plugin.ShortUrlsPlugin.after_create'
+dataset_after_create_action = \
+    'ckanext.short_urls.plugin.ShortUrlsPlugin.after_dataset_create'
+resource_after_create_action = \
+    'ckanext.short_urls.plugin.ShortUrlsPlugin.after_resource_create'
 
 
 @pytest.mark.usefixtures('with_plugins')
@@ -153,7 +155,7 @@ class TestPlugin(object):
 
     def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
         user = factories.User()
-        with mock.patch(dataset_or_resource_after_create_action):
+        with mock.patch(dataset_after_create_action):
             dataset = factories.Dataset(user=user)
         response = app.get(
             url=url_for(
@@ -169,7 +171,7 @@ class TestPlugin(object):
     def test_short_url_on_resource_page_is_hidden_if_missing(self, app):
         user = factories.User()
         dataset = factories.Dataset(user=user)
-        with mock.patch(dataset_or_resource_after_create_action):
+        with mock.patch(resource_after_create_action):
             resource = factories.Resource(package_id=dataset['id'])
         response = app.get(
             url=url_for(
