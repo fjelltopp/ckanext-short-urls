@@ -48,6 +48,9 @@ jobs:
         pip install -r dev-requirements.txt
         pip install -e .
 
+    - name: Set Git safe directory
+      run: git config --global --add safe.directory /__w/ckanext-short-urls/ckanext-short-urls
+
     - name: Checkout custom branch for CKAN 2.9
       if: matrix.ckan-version == '2.9'
       run: |
