@@ -3,23 +3,34 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ckan-version: ['2.9', '2.10']
+        include:
+          - ckan-version: '2.9'
+            ckan-image: ckan/ckan-base:2.9.11
+            solr-image: ckan/ckan-solr:2.9-solr8
+            postgres-image: ckan/ckan-postgres-dev:2.9
+          - ckan-version: '2.10'
+            ckan-image: ckan/ckan-base:2.10
+            solr-image: ckan/ckan-solr:2.10-solr8
+            postgres-image: ckan/ckan-postgres-dev:2.10
+
     container:
-      # The CKAN version tag of the Solr and Postgres containers should match
-      # the one of the container the tests run on.
-      # You can switch this base image with a custom image tailored to your project
-      image: openknowledge/ckan-dev:2.9
+      image: ${{ matrix.ckan-image }}
+
     services:
       solr:
-        image: ckan/ckan-solr-dev:2.9
+        image: ${{ matrix.solr-image }}
       postgres:
-        image: ckan/ckan-postgres-dev:2.9
+        image: ${{ matrix.postgres-image }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
-          image: redis:3
+        image: redis:3
 
     env:
       CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
@@ -36,6 +47,13 @@ jobs:
         pip install -r requirements.txt
         pip install -r dev-requirements.txt
         pip install -e .
+
+    - name: Checkout custom branch for CKAN 2.9
+      if: matrix.ckan-version == '2.9'
+      run: |
+        git fetch origin
+        git checkout dev-2.9
+
     - name: Setup extension
       # Extra initialization steps
       run: |
@@ -45,4 +63,3 @@ jobs:
         ckan -c test.ini db init
     - name: Run tests
       run: pytest --ckan-ini=test.ini --cov=ckanext.short_urls --disable-warnings ckanext/short_urls
-
