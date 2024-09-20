@@ -1,6 +1,5 @@
 pytest-ckan
 mock
 pytest-factoryboy
-beautifulsoup4
 pytest-cov
 pylons
