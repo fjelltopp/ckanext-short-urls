@@ -51,11 +51,11 @@ jobs:
     - name: Set Git safe directory
       run: git config --global --add safe.directory /__w/ckanext-short-urls/ckanext-short-urls
 
-    - name: Checkout custom branch for CKAN 2.9
+    - name: Checkout tag 1.0.0
       if: matrix.ckan-version == '2.9'
       run: |
-        git fetch origin
-        git checkout dev-2.9
+        git fetch --tags
+        git checkout 1.0.0
 
     - name: Setup extension
       # Extra initialization steps
