@@ -9,7 +9,7 @@ https://yourckan.org/link/xxxx -> https://yourcan.org/dataset/my-dataset/resourc
 
 ## Requirements
 
-The extension has been developed and tested with CKAN 2.9 + python3
+The extension has been developed and tested with CKAN 2.9, 2.10 and python3
 
 ## Installation
 
@@ -93,7 +93,7 @@ If ckanext-short-urls should be available on PyPI you can follow these steps to 
        git push
 
 6. Tag the new release of the project on GitHub with the version number from
-   the `setup.py` file. For example if the version number in `setup.py` is
+   the `setup.py` file. The tag should be 1.*.* for any release compatible with CKAN 2.9, and 2.*.* for releases compatible with CKAN 2.10. For example if the version number in `setup.py` is
    0.0.1 then do:
 
        git tag 0.0.1
