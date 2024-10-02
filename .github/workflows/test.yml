@@ -55,7 +55,9 @@ jobs:
       if: matrix.ckan-version == '2.9'
       run: |
         git fetch --tags
-        git checkout 1.0.0
+        LATEST_TAG=$(git tag -l '1.*.*' --sort=-v:refname | head -n 1 || echo '1.0.0')
+        echo "Latest 1.x.x tag or default: $LATEST_TAG"
+        git checkout $LATEST_TAG 
 
     - name: Setup extension
       # Extra initialization steps
