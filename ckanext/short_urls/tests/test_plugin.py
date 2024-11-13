@@ -68,7 +68,7 @@ class TestPlugin(object):
             short_url_create(ObjectType.RESOURCE, resource['id'])
 
     def test_short_url_on_dataset_page_is_correct(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         short_url = get_short_url_from_object_id(dataset['id'])
         expected_short_url_href = url_for(
@@ -89,7 +89,7 @@ class TestPlugin(object):
         assert short_url_href == expected_short_url_href
 
     def test_short_url_on_resource_page_is_correct(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         resource = factories.Resource(package_id=dataset['id'])
         short_url = get_short_url_from_object_id(resource['id'])
@@ -112,7 +112,7 @@ class TestPlugin(object):
         assert short_url_href == expected_short_url_href
 
     def test_short_url_for_dataset_redirects_to_dataset_page(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         short_url = get_short_url_from_object_id(dataset['id'])
         response = app.get(
@@ -132,7 +132,7 @@ class TestPlugin(object):
         assert response.headers['location'] == dataset_read_url
 
     def test_short_url_for_resource_redirects_to_resource_page(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         resource = factories.Resource(package_id=dataset['id'])
         short_url = get_short_url_from_object_id(resource['id'])
@@ -154,8 +154,8 @@ class TestPlugin(object):
         assert response.headers['location'] == resource_read_url
 
     def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
-        user = factories.User()
-        with mock.patch(dataset_after_create_action):
+        user = factories.UserWithToken()
+        with mock.patch(dataset_or_resource_after_create_action):
             dataset = factories.Dataset(user=user)
         response = app.get(
             url=url_for(
@@ -169,7 +169,7 @@ class TestPlugin(object):
         assert not short_url_div
 
     def test_short_url_on_resource_page_is_hidden_if_missing(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         with mock.patch(resource_after_create_action):
             resource = factories.Resource(package_id=dataset['id'])
