@@ -81,7 +81,7 @@ class TestPlugin(object):
                 'dataset.read',
                 id=dataset['name'],
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='DatasetPageShortUrlContainer')
@@ -104,7 +104,7 @@ class TestPlugin(object):
                 id=dataset['id'],
                 resource_id=resource['id']
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='ResourcePageShortUrlContainer')
@@ -120,7 +120,7 @@ class TestPlugin(object):
                 'short_urls.redirect',
                 code=short_url['code']
             ),
-            extra_environ={'REMOTE_USER': user['name']},
+            headers={"Authorization": user["token"]},
             status=302,
             follow_redirects=False
         )
@@ -141,7 +141,7 @@ class TestPlugin(object):
                 'short_urls.redirect',
                 code=short_url['code']
             ),
-            extra_environ={'REMOTE_USER': user['name']},
+            headers={"Authorization": user["token"]},
             status=302,
             follow_redirects=False
         )
@@ -162,7 +162,7 @@ class TestPlugin(object):
                 'dataset.read',
                 id=dataset['name'],
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='DatasetPageShortUrlContainer')
@@ -179,7 +179,7 @@ class TestPlugin(object):
                 id=dataset['id'],
                 resource_id=resource['id']
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='ResourcePageShortUrlContainer')
