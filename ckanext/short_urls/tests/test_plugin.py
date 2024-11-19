@@ -7,10 +7,13 @@ from ckan.model import core
 from ckan.lib.helpers import url_for
 from ckan.tests import factories
 import ckan.plugins.toolkit as t
-from ckanext.short_urls.logic import get_short_url_from_object_id
+from ckanext.short_urls.logic import get_short_url_from_object_id, short_url_create
 from ckanext.short_urls.model import ObjectType
 from sqlalchemy.exc import IntegrityError
 from bs4 import BeautifulSoup
+
+from ckanext.short_urls.model import ObjectType
+
 
 generate_unique_short_url_code_function = \
     'ckanext.short_urls.logic._generate_unique_short_url_code'
@@ -25,8 +28,9 @@ class TestPlugin(object):
 
     def test_short_url_is_created_on_dataset_create(self):
         dataset = factories.Dataset()
+        created_short_url = short_url_create(ObjectType.DATASET, dataset['id'])
         short_url = get_short_url_from_object_id(dataset['id'])
-        assert short_url['code']
+        assert short_url['code'] == created_short_url['code']
         assert short_url['object_type'] == ObjectType.DATASET
         assert short_url['object_id'] == dataset['id']
 
