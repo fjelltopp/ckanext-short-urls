@@ -28,17 +28,15 @@ class TestPlugin(object):
 
     def test_short_url_is_created_on_dataset_create(self):
         dataset = factories.Dataset()
-        created_short_url = short_url_create(ObjectType.DATASET, dataset['id'])
         short_url = get_short_url_from_object_id(dataset['id'])
-        assert short_url['code'] == created_short_url['code']
+        assert short_url['code']
         assert short_url['object_type'] == ObjectType.DATASET
         assert short_url['object_id'] == dataset['id']
 
     def test_short_url_is_created_on_resource_create(self):
         resource = factories.Resource()
-        created_short_url = short_url_create(ObjectType.RESOURCE, resource['id'])
         short_url = get_short_url_from_object_id(resource['id'])
-        assert short_url['code'] == created_short_url['code']
+        assert short_url['code']
         assert short_url['object_type'] == ObjectType.RESOURCE
         assert short_url['object_id'] == resource['id']
 
@@ -47,11 +45,9 @@ class TestPlugin(object):
             generate_unique_short_url_code_function,
             return_value='duplicate_short_code'
         ):
-            dataset_one = factories.Dataset()
-            short_url_create(ObjectType.DATASET, dataset_one['id'])
+            factories.Dataset()
             with pytest.raises(IntegrityError):
-                dataset_two = factories.Dataset()
-                short_url_create(ObjectType.DATASET, dataset_two['id'])
+                factories.Dataset()
 
     def test_creating_multiple_resource_short_urls_with_the_same_code(self):
         dataset = factories.Dataset()
@@ -59,15 +55,12 @@ class TestPlugin(object):
             generate_unique_short_url_code_function,
             return_value='duplicate_short_code'
         ):
-            resource_one = factories.Resource(package_id=dataset['id'])
-            short_url_create(ObjectType.RESOURCE, resource_one['id'])
+            factories.Resource(package_id=dataset['id'])
             with pytest.raises(IntegrityError):
-                resource_two = factories.Resource(package_id=dataset['id'])
-                short_url_create(ObjectType.RESOURCE, resource_two['id'])
+                factories.Resource(package_id=dataset['id'])
 
     def test_creating_multiple_short_urls_for_the_same_dataset_gives_an_error(self):
         dataset = factories.Dataset()
-        short_url_create(ObjectType.DATASET, dataset['id'])
         with pytest.raises(IntegrityError):
             short_url_create(ObjectType.DATASET, dataset['id'])
 
