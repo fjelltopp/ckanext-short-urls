@@ -158,7 +158,7 @@ class TestPlugin(object):
 
     def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
         user = factories.UserWithToken()
-        with mock.patch(dataset_or_resource_after_create_action):
+        with mock.patch(dataset_after_create_action):
             dataset = factories.Dataset(user=user)
         response = app.get(
             url=url_for(
