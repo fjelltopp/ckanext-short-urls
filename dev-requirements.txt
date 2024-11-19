@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 pytest-factoryboy
 pytest-ckan
 pytest-cov
 mock
+=======
+
+pytest==6.2.2
+>>>>>>> 625cc67 (Make sure to hve pytest installed.)
