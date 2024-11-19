@@ -45,4 +45,4 @@ jobs:
 
         ckan -c test.ini db init
     - name: Run tests
-      run: pytest --ckan-ini=test.ini --disable-warnings ckanext/short_urls
+      run: pytest --ckan-ini=test.ini --cov=ckanext.short_urls --disable-warnings ckanext/short_urls
