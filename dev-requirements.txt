@@ -1,5 +1,4 @@
-pytest-ckan
-mock
 pytest-factoryboy
+pytest-ckan
 pytest-cov
-pylons
+mock
