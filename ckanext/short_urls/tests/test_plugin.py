@@ -63,6 +63,7 @@ class TestPlugin(object):
 
     def test_creating_multiple_short_urls_for_the_same_dataset_gives_an_error(self):
         dataset = factories.Dataset()
+        short_url_create(ObjectType.DATASET, dataset['id'])
         with pytest.raises(IntegrityError):
             short_url_create(ObjectType.DATASET, dataset['id'])
 
