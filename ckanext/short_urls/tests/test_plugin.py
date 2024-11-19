@@ -36,8 +36,9 @@ class TestPlugin(object):
 
     def test_short_url_is_created_on_resource_create(self):
         resource = factories.Resource()
+        created_short_url = short_url_create(ObjectType.RESOURCE, resource['id'])
         short_url = get_short_url_from_object_id(resource['id'])
-        assert short_url['code']
+        assert short_url['code'] == created_short_url['code']
         assert short_url['object_type'] == ObjectType.RESOURCE
         assert short_url['object_id'] == resource['id']
 
