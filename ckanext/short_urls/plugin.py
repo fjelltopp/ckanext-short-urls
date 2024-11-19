@@ -56,8 +56,7 @@ class ShortUrlsPlugin(plugins.SingletonPlugin):
 
     # IPackageController & IResourceController
     def after_dataset_create(self, context, data_dict):
-        if not _data_dict_is_resource(data_dict):
-            short_url_create(ObjectType.DATASET, data_dict['id'])
+        short_url_create(ObjectType.DATASET, data_dict['id'])
 
     def after_resource_create(self, context, data_dict):
         short_url_create(ObjectType.RESOURCE, data_dict['id'])

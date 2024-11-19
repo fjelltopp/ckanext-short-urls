@@ -1,5 +1,5 @@
-pytest-ckan
-mock
-pytest-factoryboy
-pytest-cov
-pylons
+beautifulsoup4==4.12.3
+pytest-factoryboy==2.7.0
+pytest-ckan==0.0.12
+pytest-cov==2.11.1
+mock==2.0.0

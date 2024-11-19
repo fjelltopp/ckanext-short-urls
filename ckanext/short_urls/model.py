@@ -2,7 +2,10 @@ import enum
 from enum import auto
 from sqlalchemy import Column, types, UniqueConstraint, Enum
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import engine_from_config
 from ckan.model.meta import metadata
+from ckan.model import ensure_engine, init_model
+from ckan.common import config
 
 Base = declarative_base(metadata=metadata)
 
@@ -30,8 +33,12 @@ class ShortUrl(Base):
 
 
 def init_tables():
-    ShortUrl.__table__.create()
+    engine = engine_from_config(config)
+    init_model(engine)
+    ShortUrl.__table__.create(ensure_engine())
 
 
 def tables_exists():
-    return ShortUrl.__table__.exists()
+    engine = engine_from_config(config)
+    init_model(engine)
+    return ShortUrl.__table__.exists(ensure_engine())

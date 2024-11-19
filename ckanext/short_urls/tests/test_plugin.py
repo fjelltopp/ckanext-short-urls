@@ -7,10 +7,13 @@ from ckan.model import core
 from ckan.lib.helpers import url_for
 from ckan.tests import factories
 import ckan.plugins.toolkit as t
-from ckanext.short_urls.logic import get_short_url_from_object_id
+from ckanext.short_urls.logic import get_short_url_from_object_id, short_url_create
 from ckanext.short_urls.model import ObjectType
 from sqlalchemy.exc import IntegrityError
 from bs4 import BeautifulSoup
+
+from ckanext.short_urls.model import ObjectType
+
 
 generate_unique_short_url_code_function = \
     'ckanext.short_urls.logic._generate_unique_short_url_code'
@@ -68,7 +71,7 @@ class TestPlugin(object):
             short_url_create(ObjectType.RESOURCE, resource['id'])
 
     def test_short_url_on_dataset_page_is_correct(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         short_url = get_short_url_from_object_id(dataset['id'])
         expected_short_url_href = url_for(
@@ -81,7 +84,7 @@ class TestPlugin(object):
                 'dataset.read',
                 id=dataset['name'],
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='DatasetPageShortUrlContainer')
@@ -89,7 +92,7 @@ class TestPlugin(object):
         assert short_url_href == expected_short_url_href
 
     def test_short_url_on_resource_page_is_correct(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         resource = factories.Resource(package_id=dataset['id'])
         short_url = get_short_url_from_object_id(resource['id'])
@@ -104,7 +107,7 @@ class TestPlugin(object):
                 id=dataset['id'],
                 resource_id=resource['id']
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='ResourcePageShortUrlContainer')
@@ -112,7 +115,7 @@ class TestPlugin(object):
         assert short_url_href == expected_short_url_href
 
     def test_short_url_for_dataset_redirects_to_dataset_page(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         short_url = get_short_url_from_object_id(dataset['id'])
         response = app.get(
@@ -120,7 +123,7 @@ class TestPlugin(object):
                 'short_urls.redirect',
                 code=short_url['code']
             ),
-            extra_environ={'REMOTE_USER': user['name']},
+            headers={"Authorization": user["token"]},
             status=302,
             follow_redirects=False
         )
@@ -132,7 +135,7 @@ class TestPlugin(object):
         assert response.headers['location'] == dataset_read_url
 
     def test_short_url_for_resource_redirects_to_resource_page(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         resource = factories.Resource(package_id=dataset['id'])
         short_url = get_short_url_from_object_id(resource['id'])
@@ -141,7 +144,7 @@ class TestPlugin(object):
                 'short_urls.redirect',
                 code=short_url['code']
             ),
-            extra_environ={'REMOTE_USER': user['name']},
+            headers={"Authorization": user["token"]},
             status=302,
             follow_redirects=False
         )
@@ -154,7 +157,7 @@ class TestPlugin(object):
         assert response.headers['location'] == resource_read_url
 
     def test_short_url_on_dataset_page_is_hidden_if_missing(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         with mock.patch(dataset_after_create_action):
             dataset = factories.Dataset(user=user)
         response = app.get(
@@ -162,14 +165,14 @@ class TestPlugin(object):
                 'dataset.read',
                 id=dataset['name'],
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='DatasetPageShortUrlContainer')
         assert not short_url_div
 
     def test_short_url_on_resource_page_is_hidden_if_missing(self, app):
-        user = factories.User()
+        user = factories.UserWithToken()
         dataset = factories.Dataset(user=user)
         with mock.patch(resource_after_create_action):
             resource = factories.Resource(package_id=dataset['id'])
@@ -179,7 +182,7 @@ class TestPlugin(object):
                 id=dataset['id'],
                 resource_id=resource['id']
             ),
-            extra_environ={'REMOTE_USER': user['name']}
+            headers={"Authorization": user["token"]}
         )
         soup = BeautifulSoup(response.body)
         short_url_div = soup.find(id='ResourcePageShortUrlContainer')

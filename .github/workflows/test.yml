@@ -3,34 +3,24 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ckan-version: ['2.9', '2.10']
-        include:
-          - ckan-version: '2.9'
-            ckan-image: ckan/ckan-base:2.9.11
-            solr-image: ckan/ckan-solr:2.9-solr8
-            postgres-image: ckan/ckan-postgres-dev:2.9
-          - ckan-version: '2.10'
-            ckan-image: ckan/ckan-base:2.10
-            solr-image: ckan/ckan-solr:2.10-solr8
-            postgres-image: ckan/ckan-postgres-dev:2.10
-
     container:
-      image: ${{ matrix.ckan-image }}
-
+      # The CKAN version tag of the Solr and Postgres containers should match
+      # the one of the container the tests run on.
+      # You can switch this base image with a custom image tailored to your project
+      image: ckan/ckan-base:2.11-py3.10
+      options: --user root
     services:
       solr:
-        image: ${{ matrix.solr-image }}
+        image: ckan/ckan-solr:2.11-solr9
       postgres:
-        image: ${{ matrix.postgres-image }}
+        image: ckan/ckan-postgres-dev:2.11
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
-        image: redis:3
+          image: redis:3
 
     env:
       CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
@@ -40,25 +30,13 @@ jobs:
       CKAN_REDIS_URL: redis://redis:6379/1
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install requirements
       # Install any extra requirements your extension has here (dev requirements, other extensions etc)
       run: |
         pip install -r requirements.txt
         pip install -r dev-requirements.txt
         pip install -e .
-
-    - name: Set Git safe directory
-      run: git config --global --add safe.directory /__w/ckanext-short-urls/ckanext-short-urls
-
-    - name: Checkout tag 1.0.0
-      if: matrix.ckan-version == '2.9'
-      run: |
-        git fetch --tags
-        LATEST_TAG=$(git tag -l '1.*.*' --sort=-v:refname | head -n 1 || echo '1.0.0')
-        echo "Latest 1.x.x tag or default: $LATEST_TAG"
-        git checkout $LATEST_TAG 
-
     - name: Setup extension
       # Extra initialization steps
       run: |
