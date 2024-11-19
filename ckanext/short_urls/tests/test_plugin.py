@@ -47,9 +47,11 @@ class TestPlugin(object):
             generate_unique_short_url_code_function,
             return_value='duplicate_short_code'
         ):
-            factories.Dataset()
+            dataset_one = factories.Dataset()
+            short_url_create(ObjectType.DATASET, dataset_one['id'])
             with pytest.raises(IntegrityError):
-                factories.Dataset()
+                dataset_two = factories.Dataset()
+                short_url_create(ObjectType.DATASET, dataset_two['id'])
 
     def test_creating_multiple_resource_short_urls_with_the_same_code(self):
         dataset = factories.Dataset()
